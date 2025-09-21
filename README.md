@@ -5,17 +5,14 @@ A simple REST API key-value store with a test client.
 ## Overview
 
 The `kv_service` provides a REST API for a simple key-value store.
-It is served locally at localhost:8080 by default.
 
 The API base url is `/api/v1`
 
-Endpoints:
-
-| Name        | Method | Body               | Success Response Format     | Error Response Format      | Notes                                                          |
-| ----------- | ------ | ------------------ | --------------------------- | -------------------------- | -------------------------------------------------------------- |
-| /keys/<key> | GET    | N/A                | {"value": <value>}          | {"error": <error message>} | Requesting a key that does not exist returns a value of `null` |
-| /keys/<key> | POST   | {"value": <value>} | {"message": "Key set."}     | {"error": <error message>} |                                                                |
-| /keys/<key> | DELETE | N/A                | {"message": "Key deleted."} | {"error": <error message>} |                                                                |
+| Endpoint   | Method | Description      | Request Body     | Success Response Format | Error Response Format | Notes                                                 |
+| ---------- | ------ | ---------------- | ---------------- | ----------------------- | --------------------- | ----------------------------------------------------- |
+| /keys/:key | GET    | Retrieve a value | N/A              | {"value": value}        | {"error": msg}        | Returns a `null` value response for keys not found    |
+| /keys/:key | POST   | Set a value      | {"value": value} | {"message": msg}        | {"error": msg}        |                                                       |
+| /keys/:key | DELETE | Delete a key     | N/A              | {"message": msg}        | {"error": msg}        | Returns a success response even for non-existent keys |
 
 ## Setup
 
@@ -34,4 +31,4 @@ To run the kv_service in dev mode with hot reloading and Gin debugging logs, cd 
 ## Design notes
 
 1. The kv store and service intentionally limit the 'error' cases by returning nil for keys not yet defined and no-oping if attempting to delete a key that does not exist. This reduces complexity by eliminating the need to check for and handle those errors within the calling code.
-2. The kv service's endpoint structure of `/keys/:key` allows for extendibility if we want to have other operations across all keys, such as a `DELETE` request to `/keys` to clear all key/values at once.
+2. The kv service's endpoint structure of `/keys/:key` allows for extendibility if we want to have other operations across all keys, such as a `GET` or `DELETE` request to `/keys` to view all or clear all key value pairs at once, respectively.
