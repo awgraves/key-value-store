@@ -1,0 +1,12 @@
+services:
+  kv-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+      - /app/tmp  # Exclude tmp directory from volume mount
+    environment:
+      - GIN_MODE=debug
