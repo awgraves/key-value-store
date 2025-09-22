@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"encoding/json"
@@ -8,21 +8,23 @@ import (
 	"strings"
 )
 
-type APIv1Client interface {
+// Client defines the interface for interacting with the KV service
+type Client interface {
 	SetKey(key string, value any) error
 	DeleteKey(key string) error
 	GetKey(key string) (any, error) // returns unwrapped value from response
 }
 
-type apiV1Client struct {
-	baseURL string
+// httpClient is an HTTP implementation of Client
+type httpClient struct {
+	BaseURL string
 }
 
-func NewAPIv1Client(baseURL string) *apiV1Client {
-	return &apiV1Client{baseURL: baseURL}
+func NewHTTPClient(baseURL string) *httpClient {
+	return &httpClient{BaseURL: baseURL}
 }
 
-func (c *apiV1Client) SetKey(key string, value any) error {
+func (c *httpClient) SetKey(key string, value any) error {
 	fmt.Println("setting key: ", key, "value: ", value)
 	bodyMap := map[string]any{
 		"value": value,
@@ -31,7 +33,7 @@ func (c *apiV1Client) SetKey(key string, value any) error {
 	if err != nil {
 		return err
 	}
-	response, err := http.Post(fmt.Sprintf("%s/keys/%s", c.baseURL, key), "application/json", strings.NewReader(string(body)))
+	response, err := http.Post(fmt.Sprintf("%s/keys/%s", c.BaseURL, key), "application/json", strings.NewReader(string(body)))
 	if err != nil {
 		return err
 	}
@@ -45,8 +47,8 @@ func (c *apiV1Client) SetKey(key string, value any) error {
 	return nil
 }
 
-func (c *apiV1Client) DeleteKey(key string) error {
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/keys/%s", c.baseURL, key), nil)
+func (c *httpClient) DeleteKey(key string) error {
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/keys/%s", c.BaseURL, key), nil)
 	if err != nil {
 		return err
 	}
@@ -63,8 +65,8 @@ func (c *apiV1Client) DeleteKey(key string) error {
 	return nil
 }
 
-func (c *apiV1Client) GetKey(key string) (any, error) {
-	response, err := http.Get(fmt.Sprintf("%s/keys/%s", c.baseURL, key))
+func (c *httpClient) GetKey(key string) (any, error) {
+	response, err := http.Get(fmt.Sprintf("%s/keys/%s", c.BaseURL, key))
 	if err != nil {
 		return nil, err
 	}

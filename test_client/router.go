@@ -3,22 +3,13 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 
+	"github.com/awgraves/key-value-store/test_client/client"
 	"github.com/gin-gonic/gin"
 )
 
-// getKVServiceAPIv1BaseURL returns the base URL for the KV service API v1
-// Uses environment variable KV_SERVICE_API_V1_BASE_URL with fallback to localhost
-func getKVServiceAPIv1BaseURL() string {
-	if url := os.Getenv("KV_SERVICE_API_V1_BASE_URL"); url != "" {
-		return url
-	}
-	return "http://localhost:8080/api/v1"
-}
-
 // testDeletionHandler handles the test deletion endpoint
-func testDeletionHandler(client APIv1Client) gin.HandlerFunc {
+func testDeletionHandler(client client.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Example: This would test deleting a key from the KV service
 		testKey := "test-key"
@@ -82,7 +73,7 @@ func testDeletionHandler(client APIv1Client) gin.HandlerFunc {
 }
 
 // testOverwriteHandler handles the test overwrite endpoint
-func testOverwriteHandler(client APIv1Client) gin.HandlerFunc {
+func testOverwriteHandler(client client.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Example: This would test overwriting a key in the KV service
 		testKey := "test-key"
@@ -147,24 +138,23 @@ func testOverwriteHandler(client APIv1Client) gin.HandlerFunc {
 }
 
 // configHandler handles the config endpoint
-func configHandler() gin.HandlerFunc {
+func configHandler(kvAPIv1BaseURL string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Endpoint to check the current configuration
-		kvAPIv1BaseURL := getKVServiceAPIv1BaseURL()
 		c.JSON(http.StatusOK, gin.H{
 			"kv_api_v1_base_url": kvAPIv1BaseURL,
 		})
 	}
 }
 
-func setupRouter(client APIv1Client) *gin.Engine {
+func setupRouter(client client.Client, kvAPIv1BaseURL string) *gin.Engine {
 	r := gin.Default()
 
 	v1 := r.Group("/api/v1")
 	{
 		v1.GET("/test_deletion", testDeletionHandler(client))
 		v1.GET("/test_overwrite", testOverwriteHandler(client))
-		v1.GET("/config", configHandler())
+		v1.GET("/config", configHandler(kvAPIv1BaseURL))
 	}
 
 	return r

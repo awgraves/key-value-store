@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"encoding/json"
@@ -14,13 +14,12 @@ type clientTestSuite struct {
 	suite.Suite
 }
 
-func (s *clientTestSuite) TestNewAPIv1Client() {
+func (s *clientTestSuite) TestNewHTTPAPIv1Client() {
 	baseURL := "http://localhost:8080"
-	client := NewAPIv1Client(baseURL)
+	client := NewHTTPClient(baseURL)
 
 	assert.NotNil(s.T(), client)
-	assert.Equal(s.T(), baseURL, client.baseURL)
-	assert.Implements(s.T(), (*APIv1Client)(nil), client)
+	assert.Implements(s.T(), (*Client)(nil), client)
 }
 
 func (s *clientTestSuite) TestSetKey_Success() {
@@ -40,7 +39,7 @@ func (s *clientTestSuite) TestSetKey_Success() {
 	}))
 	defer server.Close()
 
-	client := NewAPIv1Client(server.URL)
+	client := NewHTTPClient(server.URL)
 	err := client.SetKey("testkey", "testvalue")
 
 	assert.NoError(s.T(), err)
@@ -63,7 +62,7 @@ func (s *clientTestSuite) TestSetKey_WithComplexValue() {
 	}))
 	defer server.Close()
 
-	client := NewAPIv1Client(server.URL)
+	client := NewHTTPClient(server.URL)
 	complexValue := map[string]interface{}{
 		"nested": "data",
 		"number": 42,
@@ -80,7 +79,7 @@ func (s *clientTestSuite) TestSetKey_ServerError() {
 	}))
 	defer server.Close()
 
-	client := NewAPIv1Client(server.URL)
+	client := NewHTTPClient(server.URL)
 	err := client.SetKey("testkey", "testvalue")
 
 	assert.Error(s.T(), err)
@@ -89,7 +88,7 @@ func (s *clientTestSuite) TestSetKey_ServerError() {
 }
 
 func (s *clientTestSuite) TestSetKey_InvalidJSON() {
-	client := NewAPIv1Client("http://localhost:8080")
+	client := NewHTTPClient("http://localhost:8080")
 
 	// Test with a value that cannot be marshaled to JSON
 	invalidValue := make(chan int)
@@ -100,7 +99,7 @@ func (s *clientTestSuite) TestSetKey_InvalidJSON() {
 
 func (s *clientTestSuite) TestSetKey_NetworkError() {
 	// Use an invalid URL to simulate network error
-	client := NewAPIv1Client("http://invalid-url-that-does-not-exist:9999")
+	client := NewHTTPClient("http://invalid-url-that-does-not-exist:9999")
 	err := client.SetKey("testkey", "testvalue")
 
 	assert.Error(s.T(), err)
@@ -121,7 +120,7 @@ func (s *clientTestSuite) TestGetKey_Success() {
 	}))
 	defer server.Close()
 
-	client := NewAPIv1Client(server.URL)
+	client := NewHTTPClient(server.URL)
 	value, err := client.GetKey("testkey")
 
 	assert.NoError(s.T(), err)
@@ -145,7 +144,7 @@ func (s *clientTestSuite) TestGetKey_ComplexValue() {
 	}))
 	defer server.Close()
 
-	client := NewAPIv1Client(server.URL)
+	client := NewHTTPClient(server.URL)
 	value, err := client.GetKey("complexkey")
 
 	assert.NoError(s.T(), err)
@@ -158,7 +157,7 @@ func (s *clientTestSuite) TestGetKey_ServerError() {
 	}))
 	defer server.Close()
 
-	client := NewAPIv1Client(server.URL)
+	client := NewHTTPClient(server.URL)
 	value, err := client.GetKey("testkey")
 
 	assert.Error(s.T(), err)
@@ -176,7 +175,7 @@ func (s *clientTestSuite) TestGetKey_InvalidJSON() {
 	}))
 	defer server.Close()
 
-	client := NewAPIv1Client(server.URL)
+	client := NewHTTPClient(server.URL)
 	value, err := client.GetKey("testkey")
 
 	assert.Error(s.T(), err)
@@ -184,7 +183,7 @@ func (s *clientTestSuite) TestGetKey_InvalidJSON() {
 }
 
 func (s *clientTestSuite) TestGetKey_NetworkError() {
-	client := NewAPIv1Client("http://invalid-url-that-does-not-exist:9999")
+	client := NewHTTPClient("http://invalid-url-that-does-not-exist:9999")
 	value, err := client.GetKey("testkey")
 
 	assert.Error(s.T(), err)
@@ -200,7 +199,7 @@ func (s *clientTestSuite) TestDeleteKey_Success() {
 	}))
 	defer server.Close()
 
-	client := NewAPIv1Client(server.URL)
+	client := NewHTTPClient(server.URL)
 	err := client.DeleteKey("testkey")
 
 	assert.NoError(s.T(), err)
@@ -212,7 +211,7 @@ func (s *clientTestSuite) TestDeleteKey_ServerError() {
 	}))
 	defer server.Close()
 
-	client := NewAPIv1Client(server.URL)
+	client := NewHTTPClient(server.URL)
 	err := client.DeleteKey("testkey")
 
 	assert.Error(s.T(), err)
@@ -221,7 +220,7 @@ func (s *clientTestSuite) TestDeleteKey_ServerError() {
 }
 
 func (s *clientTestSuite) TestDeleteKey_NetworkError() {
-	client := NewAPIv1Client("http://invalid-url-that-does-not-exist:9999")
+	client := NewHTTPClient("http://invalid-url-that-does-not-exist:9999")
 	err := client.DeleteKey("testkey")
 
 	assert.Error(s.T(), err)
@@ -229,7 +228,7 @@ func (s *clientTestSuite) TestDeleteKey_NetworkError() {
 
 func (s *clientTestSuite) TestDeleteKey_RequestCreationError() {
 	// Test with an invalid URL that would cause NewRequest to fail
-	client := NewAPIv1Client("ht tp://invalid-url-with-space")
+	client := NewHTTPClient("ht tp://invalid-url-with-space")
 	err := client.DeleteKey("testkey")
 
 	assert.Error(s.T(), err)

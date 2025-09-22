@@ -11,35 +11,35 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type mockAPIv1Client struct {
+type mockClient struct {
 	mock.Mock
 }
 
-func (m *mockAPIv1Client) SetKey(key string, value any) error {
+func (m *mockClient) SetKey(key string, value any) error {
 	args := m.Called(key, value)
 	return args.Error(0)
 }
 
-func (m *mockAPIv1Client) DeleteKey(key string) error {
+func (m *mockClient) DeleteKey(key string) error {
 	args := m.Called(key)
 	return args.Error(0)
 }
 
-func (m *mockAPIv1Client) GetKey(key string) (any, error) {
+func (m *mockClient) GetKey(key string) (any, error) {
 	args := m.Called(key)
 	return args.Get(0), args.Error(1)
 }
 
 type routerTestSuite struct {
 	suite.Suite
-	mockClient *mockAPIv1Client
+	mockClient *mockClient
 	router     *gin.Engine
 }
 
 func (s *routerTestSuite) SetupTest() {
 	gin.SetMode(gin.TestMode)
-	s.mockClient = new(mockAPIv1Client)
-	s.router = setupRouter(s.mockClient)
+	s.mockClient = new(mockClient)
+	s.router = setupRouter(s.mockClient, "http://localhost:8080/api/v1")
 }
 
 func (s *routerTestSuite) TestTestDeletion_Success() {
