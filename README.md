@@ -35,13 +35,32 @@ The following dependencies are required:
 2. Docker
 3. Docker compose
 
-### Local development
+### Make
 
 For development ease, this project uses `make`. For a list of available targets, run the `make` command without any args.
+
+### Local development
 
 To run both `kv_service` and `test_client` together in "dev mode" (hot reloading + Gin debugging logs), execute `make dev-up` from the project root. They can be stopped with `make dev-down`.
 
 To start/stop only the `kv_service` in dev mode without starting the test_client, run `make dev-kvs-up` / `make dev-kvs-down`.
+
+To view log outputs from any running dev service, execute `make dev-logs`.
+
+### Production deployment
+
+For production deployment, use the production Docker configuration:
+
+- `make prod-up` - Start both services in production mode (optimized builds, no hot reloading)
+- `make prod-down` - Stop both services in production mode
+- `make prod-build` - Build production images without starting services
+- `make prod-logs` - View logs from production services
+
+The production setup includes:
+
+- Multi-stage Docker builds for minimal image sizes
+- Optimized Go binaries without development tools
+- Release mode for Gin (no debug logging)
 
 ## Testing
 

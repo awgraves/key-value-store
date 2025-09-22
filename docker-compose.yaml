@@ -1,0 +1,23 @@
+services:
+  kv-service:
+    build:
+      context: ./kv_service
+      dockerfile: ../Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - GIN_MODE=release
+    restart: unless-stopped
+
+  test-client:
+    build:
+      context: ./test_client
+      dockerfile: ../Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - GIN_MODE=release
+      - KV_SERVICE_API_V1_BASE_URL=http://kv-service:8080/api/v1
+    depends_on:
+      - kv-service
+    restart: unless-stopped

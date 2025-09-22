@@ -7,7 +7,7 @@ help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
 # Development targets
-.PHONY: dev-up dev-down dev-kvs-up dev-kvs-down
+.PHONY: dev-up dev-down dev-kvs-up dev-kvs-down dev-logs
 dev-up: ## Start both services in development mode
 	docker-compose -f docker-compose.dev.yaml up --build -d
 
@@ -19,6 +19,23 @@ dev-kvs-up: ## Start only the key-value service in development mode
 
 dev-kvs-down: ## Stop only the key-value service in development mode
 	docker-compose -f docker-compose.dev.yaml stop kv-service
+
+dev-logs: ## View logs from development services
+	docker-compose -f docker-compose.dev.yaml logs -f
+
+# Production targets
+.PHONY: prod-up prod-down prod-build prod-logs
+prod-up: ## Start both services in production mode
+	docker-compose up --build -d
+
+prod-down: ## Stop both services in production mode
+	docker-compose down
+
+prod-build: ## Build production images without starting services
+	docker-compose build
+
+prod-logs: ## View logs from production services
+	docker-compose logs -f
 
 # Testing targets
 .PHONY: test-kvs
