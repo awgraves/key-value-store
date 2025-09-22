@@ -1,0 +1,24 @@
+services:
+  kv-service:
+    build:
+      context: ./kv_service
+      dockerfile: ../Dockerfile.dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./kv_service:/app
+    environment:
+      - GIN_MODE=debug
+
+  test-client:
+    build:
+      context: ./test_client
+      dockerfile: ../Dockerfile.dev
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./test_client:/app
+    environment:
+      - GIN_MODE=debug
+    depends_on:
+      - kv-service
