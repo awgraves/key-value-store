@@ -1,6 +1,8 @@
 package main
 
 func main() {
-	r := setupRouter()
+	kvAPIv1BaseURL := getKVServiceAPIv1BaseURL()
+	client := NewAPIv1Client(kvAPIv1BaseURL)
+	r := setupRouter(client)
 	r.Run(":8081")
 }
