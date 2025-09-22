@@ -1,0 +1,13 @@
+FROM golang:1.24.4-alpine
+
+WORKDIR /workspace
+
+COPY kv_service/go.mod kv_service/go.sum ./kv_service/
+COPY test_client/go.mod test_client/go.sum ./test_client/
+
+RUN cd kv_service && go mod download && go mod verify
+RUN cd test_client && go mod download && go mod verify
+
+WORKDIR /app
+
+CMD ["go", "test", "./...", "-v"]

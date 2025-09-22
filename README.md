@@ -4,9 +4,12 @@ A simple REST API key-value store with a test client.
 
 ## Overview
 
+### KV Service
+
 The `kv_service` provides a REST API for a simple key-value store.
 
-The API base url is `/api/v1`
+The API is exposed on default host: `http://localhost:8080`
+and the base url path is `/api/v1`.
 
 | Endpoint   | Method | Description      | Request Body     | Success Response Format | Error Response Format | Notes                                                 |
 | ---------- | ------ | ---------------- | ---------------- | ----------------------- | --------------------- | ----------------------------------------------------- |
@@ -14,11 +17,14 @@ The API base url is `/api/v1`
 | /keys/:key | POST   | Set a value      | {"value": value} | {"message": msg}        | {"error": msg}        |                                                       |
 | /keys/:key | DELETE | Delete a key     | N/A              | {"message": msg}        | {"error": msg}        | Returns a success response even for non-existent keys |
 
-The `test_client` is another service that connects to the `kv_service` and verifies its functionality.
+### Test Client
 
-The API base url is also `/api/v1` (mirrors the kv_service).
+The `test_client` is a separate service that provides its own REST API that connects to the `kv_service` and verifies its functionality.
 
-GET requests to the following endpoints will return a 200 response if the test scenario passes, otherwise it will return a 500.
+The test client API is exposed on default host: `http://localhost:8081`
+and the base url path is also `/api/v1` (mirroring the kv_service).
+
+GET requests to the following endpoints will return a 200 response with a success message if the test scenario passes, otherwise it will return a status code 500 with additional error details.
 | Endpoint | Description | Success Response Format | Error Response Format |
 | --------------- | -------------------------------------------------------------- | -------------------------------- | --------------------------------- |
 | /test_deletion | Verifies a key can be set and then deleted | {"message": msg} | {"message": msg, "error": err} |
@@ -31,9 +37,9 @@ GET requests to the following endpoints will return a 200 response if the test s
 
 The following dependencies are required:
 
-1. Make
-2. Docker
-3. Docker compose
+1. [Make](https://www.gnu.org/software/make/)
+2. [Docker](https://www.docker.com/)
+3. [Docker compose](https://docs.docker.com/compose/install/)
 
 ### Make
 
@@ -41,15 +47,17 @@ For development ease, this project uses `make`. For a list of available targets,
 
 ### Local development
 
-To run both `kv_service` and `test_client` together in "dev mode" (hot reloading + Gin debugging logs), execute `make dev-up` from the project root. They can be stopped with `make dev-down`.
+For local development, use the make commands targeting the development Docker configuration:
 
-To start/stop only the `kv_service` in dev mode without starting the test_client, run `make dev-kvs-up` / `make dev-kvs-down`.
-
-To view log outputs from any running dev service, execute `make dev-logs`.
+- `make dev-up` - Start both services in development mode (hot reloading + Gin debugging logs)
+- `make dev-down` - Stop both services in development mode
+- `make dev-kvs-up` - Start only the key-value service in development mode
+- `make dev-kvs-down` - Stop only the key-value service in development mode
+- `make dev-logs` - View logs from development services
 
 ### Production deployment
 
-For production deployment, use the production Docker configuration:
+For production deployment, use make commands targeting the production Docker configuration:
 
 - `make prod-up` - Start both services in production mode (optimized builds, no hot reloading)
 - `make prod-down` - Stop both services in production mode
@@ -64,14 +72,20 @@ The production setup includes:
 
 ## Testing
 
+### Unit tests
+
 To run all go unit tests across both services, execute `make test`.
 To run unit tests for a specific service, execute `make test-kvs` or `make test-client`.
 
+To update the test image (after adding/removing dependencies, for example), execute: `make build-test-image`
+
+### Test client -> KV service
+
 To test the `kv_service` with the `test_client`:
 
-1. Execute `make dev-up` from the project root.
+1. Execute either `make dev-up` or `make prod-up` from the project root.
 2. Visit http://localhost:8081/api/v1/:endpoint_name (see endpoints in the above table in the overview section.)
-3. You should receive success responses for passing tests, and error messages to pinpoint where something failed.
+3. You should receive success responses for passing tests, otherwise you should receive error messages to pinpoint where something may have failed.
 
 ## Design notes
 

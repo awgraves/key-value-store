@@ -38,12 +38,18 @@ prod-logs: ## View logs from production services
 	docker-compose logs -f
 
 # Testing targets
-.PHONY: test-kvs
+.PHONY: test-kvs test-client test build-test-image
+build-test-image: ## Build test image with pre-cached dependencies
+	@echo "Building test image..."
+	docker build -f Dockerfile.test -t kv-test-runner .
+
 test-kvs: ## Run all unit tests for the key-value service
-	cd kv_service && go test ./...
+	@docker image inspect kv-test-runner >/dev/null 2>&1 || make build-test-image
+	docker run --rm -v $(PWD)/kv_service:/app kv-test-runner
 
 test-client: ## Run all unit tests for the test client
-	cd test_client && go test ./...
+	@docker image inspect kv-test-runner >/dev/null 2>&1 || make build-test-image
+	docker run --rm -v $(PWD)/test_client:/app kv-test-runner
 
 test: ## Run all unit tests for both services
 	make test-kvs
