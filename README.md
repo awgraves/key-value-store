@@ -46,6 +46,7 @@ To start/stop only the `kv_service` in dev mode without starting the test_client
 ## Testing
 
 To run all go unit tests across both services, execute `make test`.
+To run unit tests for a specific service, execute `make test-kvs` or `make test-client`.
 
 To test the `kv_service` with the `test_client`:
 

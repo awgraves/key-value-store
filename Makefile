@@ -24,3 +24,10 @@ dev-kvs-down: ## Stop only the key-value service in development mode
 .PHONY: test-kvs
 test-kvs: ## Run all unit tests for the key-value service
 	cd kv_service && go test ./...
+
+test-client: ## Run all unit tests for the test client
+	cd test_client && go test ./...
+
+test: ## Run all unit tests for both services
+	make test-kvs
+	make test-client
