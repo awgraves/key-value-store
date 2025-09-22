@@ -23,7 +23,7 @@ func setupRouter(kvStore store.Store) *gin.Engine {
 			keys.POST("/:key", func(c *gin.Context) {
 				key := c.Param("key")
 				var request struct {
-					Value any `json:"value"`
+					Value any `json:"value" binding:"required"`
 				}
 				if err := c.ShouldBindJSON(&request); err != nil {
 					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

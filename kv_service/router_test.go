@@ -65,6 +65,14 @@ func (s *routerTestSuite) TestSetKey() {
 
 	call.Unset()
 }
+func (s *routerTestSuite) TestSetKey_InvalidBody() {
+	req, _ := http.NewRequest("POST", "/api/v1/keys/foo", strings.NewReader(`{"invalid":"bar"}`))
+	resp := httptest.NewRecorder()
+	s.router.ServeHTTP(resp, req)
+
+	assert.Equal(s.T(), http.StatusBadRequest, resp.Code)
+	s.Contains(resp.Body.String(), `"error"`)
+}
 
 func (s *routerTestSuite) TestDeleteKey() {
 	call := s.mockStore.On("Delete", "foo").Return()

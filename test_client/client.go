@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -22,7 +23,7 @@ func NewAPIv1Client(baseURL string) *apiV1Client {
 }
 
 func (c *apiV1Client) SetKey(key string, value any) error {
-	// marshal the value to json with structure { "value": value }
+	fmt.Println("setting key: ", key, "value: ", value)
 	bodyMap := map[string]any{
 		"value": value,
 	}
@@ -36,8 +37,11 @@ func (c *apiV1Client) SetKey(key string, value any) error {
 	}
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to set key: %s", response.Status)
+		bodyBytes, _ := io.ReadAll(response.Body)
+		fmt.Println("response body: ", string(bodyBytes))
+		return fmt.Errorf("failed to set key: %s, response: %s", response.Status, string(bodyBytes))
 	}
+	fmt.Println("response: ", response)
 	return nil
 }
 
@@ -53,7 +57,8 @@ func (c *apiV1Client) DeleteKey(key string) error {
 	}
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to delete key: %s", response.Status)
+		bodyBytes, _ := io.ReadAll(response.Body)
+		return fmt.Errorf("failed to delete key: %s, response: %s", response.Status, string(bodyBytes))
 	}
 	return nil
 }
@@ -65,7 +70,8 @@ func (c *apiV1Client) GetKey(key string) (any, error) {
 	}
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to get key: %s", response.Status)
+		bodyBytes, _ := io.ReadAll(response.Body)
+		return nil, fmt.Errorf("failed to get key: %s, response: %s", response.Status, string(bodyBytes))
 	}
 	var valueResponse struct {
 		Value any `json:"value"`
