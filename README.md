@@ -8,8 +8,7 @@ A simple REST API key-value store with a test client.
 
 The `kv_service` provides a REST API for a simple key-value store.
 
-The API is exposed on default host: `http://localhost:8080`
-and the base url path is `/api/v1`.
+The API is exposed by default at: `http://localhost:8080/api/v1`.
 
 | Endpoint   | Method | Description      | Request Body     | Success Response Format | Error Response Format | Notes                                                 |
 | ---------- | ------ | ---------------- | ---------------- | ----------------------- | --------------------- | ----------------------------------------------------- |
@@ -21,10 +20,9 @@ and the base url path is `/api/v1`.
 
 The `test_client` is a separate service that provides its own REST API that connects to the `kv_service` and verifies its functionality.
 
-The test client API is exposed on default host: `http://localhost:8081`
-and the base url path is also `/api/v1` (mirroring the kv_service).
+The test client API is exposed by default at: `http://localhost:8081/api/v1`.
 
-GET requests to the following endpoints will return a 200 response with a success message if the test scenario passes, otherwise it will return a status code 500 with additional error details.
+GET requests to the following endpoints will return a 200 response with a success message if the test scenario passes, otherwise they will return a status code 500 with additional error details.
 | Endpoint | Description | Success Response Format | Error Response Format |
 | --------------- | -------------------------------------------------------------- | -------------------------------- | --------------------------------- |
 | /test_deletion | Verifies a key can be set and then deleted | {"message": msg} | {"message": msg, "error": err} |
@@ -89,11 +87,12 @@ To update the test image (after adding/removing dependencies, for example), exec
 To test the `kv_service` with the `test_client`:
 
 1. Execute either `make dev-up` or `make prod-up` from the project root.
-2. Visit http://localhost:8081/api/v1/:endpoint_name (see endpoints in the above table in the overview section.)
+2. Visit `http://localhost:8081/api/v1/:endpoint_name` (see endpoints in the above table in the overview section.)
 3. You should receive success responses for passing tests, otherwise you should receive error messages to pinpoint where something may have failed.
 
 ## Design notes
 
-1. The kv store and service intentionally limit the 'error' cases by returning nil for keys not yet defined and no-oping if attempting to delete a key that does not exist. This reduces complexity by eliminating the need to check for and handle those errors within the calling code.
+1. The kv store implementation and service intentionally limit the 'error' cases by returning nil for keys not yet defined and no-oping if attempting to delete a key that does not exist. This reduces complexity by eliminating the need to check for and handle those errors within the calling code.
 2. The kv service's endpoint structure of `/keys/:key` allows for extendibility if we want to have other operations across all keys, such as a `GET` or `DELETE` request to `/keys` to view all or clear all key value pairs at once, respectively.
-3. Both services define their handler logic within their respective `router.go` files. At this stage its simpler to keep these together, though would certainly split those out into separate `handlers` modules if the number of endpoints grew.
+3. Both services define their handler logic within their respective `router.go` files. At this stage I think its simpler to keep these together, though would certainly split those out into separate `handlers` modules if the number of endpoints grew.
+4. `store` and `client` are separate modules with their own generic interfaces and currently 1 implmentation each. These offer flexibility to write other implementations in the future within these modules (ie a distributed KV store, or a gRPC client).
