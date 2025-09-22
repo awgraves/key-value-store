@@ -49,11 +49,16 @@ For development ease, this project uses `make`. For a list of available targets,
 
 For local development, use the make commands targeting the development Docker configuration:
 
-- `make dev-up` - Start both services in development mode (hot reloading + Gin debugging logs)
+- `make dev-up` - Start both services in development mode
 - `make dev-down` - Stop both services in development mode
 - `make dev-kvs-up` - Start only the key-value service in development mode
 - `make dev-kvs-down` - Stop only the key-value service in development mode
 - `make dev-logs` - View logs from development services
+
+The development setup includes:
+
+- Hot reloading for code changes
+- Gin debug logging
 
 ### Production deployment
 
