@@ -1,6 +1,7 @@
 # key-value-store
 
 A simple REST API key-value store with a test client.
+(This was a submission for a coding evaluation; see directions.md).
 
 ## Overview
 
